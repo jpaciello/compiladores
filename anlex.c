@@ -569,7 +569,11 @@ void sigLex()
 						{
 							break;
 						}
-						ungetc(c,archivo);
+					}
+					else if(c=='\n')
+					{
+						//incrementar el numero de linea
+						numLinea++;
 					}
 				}
 				if (c==EOF)
@@ -663,6 +667,11 @@ void sigLex()
 				c=fgetc(archivo);
 				if (c=='}')
 					break;
+				else if(c=='\n')
+				{
+					//incrementar el numero de linea
+					numLinea++;
+				}
 			}
 			if (c==EOF)
 				error("Se llego al fin de archivo sin finalizar un comentario");
