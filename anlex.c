@@ -10,75 +10,9 @@
  *	
  */
 
-/*********** LIbrerias utilizadas **************/
+/*********** Inclusión de cabecera **************/
+#include "anlex.h"
 
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-#include<ctype.h>
-
-/***************** MACROS **********************/
-
-//Codigos
-#define PROGRAM		256
-#define TYPE		257
-#define VAR			258
-#define ARRAY		259
-#define BEGIN		260
-#define END			261
-#define PR_DO		262
-#define TO			263
-#define DOWNTO		264
-#define THEN		265
-#define OF			266
-#define FUNCTION	267
-#define PROCEDURE	268
-#define PR_INTEGER	269
-#define PR_REAL		270
-#define PR_BOOLEAN	271
-#define PR_CHAR		272
-#define PR_FOR		273
-#define PR_IF		274
-#define PR_ELSE		275
-#define PR_WHILE	276
-#define REPEAT		277
-#define UNTIL		278
-#define PR_CASE		279
-#define RECORD		280
-#define WRITELN		281
-#define WRITE		282
-#define CONST		283
-#define NUM			284
-#define ID			285
-#define BOOL		286
-#define CAR			287
-#define LITERAL		288
-#define NOT			289
-#define OPREL		290
-#define OPSUMA		291
-#define OPMULT		292
-#define OPASIGNA	293
-#define USER_TYPE	294
-// Fin Codigos
-#define TAMBUFF 	5
-#define TAMLEX 		50
-#define TAMHASH 	101
-
-/************* Definiciones ********************/
-
-typedef struct entrada{
-	//definir los campos de 1 entrada de la tabla de simbolos
-	int compLex;
-	char lexema[TAMLEX];	
-	struct entrada *tipoDato; // null puede representar variable no declarada	
-	// aqui irian mas atributos para funciones y procedimientos...
-	
-} entrada;
-
-typedef struct {
-	int compLex;
-	entrada *pe;
-} token;
 
 /************* Variables globales **************/
 
@@ -104,175 +38,6 @@ void sigLex();		// Del analizador Lexico
 
 /**************** Funciones **********************/
 
-/*********************HASH************************/
-entrada *tabla;				//declarar la tabla de simbolos
-int tamTabla=TAMHASH;		//utilizado para cuando se debe hacer rehash
-int elems=0;				//utilizado para cuando se debe hacer rehash
-
-int h(const char* k, int m)
-{
-	unsigned h=0,g;
-	int i;
-	for (i=0;i<strlen(k);i++)
-	{
-		h=(h << 4) + k[i];
-		if (g=h&0xf0000000){
-			h=h^(g>>24);
-			h=h^g;
-		}
-	}
-	return h%m;
-}
-void insertar(entrada e);
-
-void initTabla()
-{	
-	int i=0;
-	
-	tabla=(entrada*)malloc(tamTabla*sizeof(entrada));
-	for(i=0;i<tamTabla;i++)
-	{
-		tabla[i].compLex=-1;
-	}
-}
-
-int esprimo(int n)
-{
-	int i;
-	for(i=3;i*i<=n;i+=2)
-		if (n%i==0)
-			return 0;
-	return 1;
-}
-
-int siguiente_primo(int n)
-{
-	if (n%2==0)
-		n++;
-	for (;!esprimo(n);n+=2);
-
-	return n;
-}
-
-//en caso de que la tabla llegue al limite, duplicar el tamaño
-void rehash()
-{
-	entrada *vieja;
-	int i;
-	vieja=tabla;
-	tamTabla=siguiente_primo(2*tamTabla);
-	initTabla();
-	for (i=0;i<tamTabla/2;i++)
-	{
-		if(vieja[i].compLex!=-1)
-			insertar(vieja[i]);
-	}		
-	free(vieja);
-}
-
-//insertar una entrada en la tabla
-void insertar(entrada e)
-{
-	int pos;
-	if (++elems>=tamTabla/2)
-		rehash();
-	pos=h(e.lexema,tamTabla);
-	while (tabla[pos].compLex!=-1)
-	{
-		pos++;
-		if (pos==tamTabla)
-			pos=0;
-	}
-	tabla[pos]=e;
-
-}
-//busca una clave en la tabla, si no existe devuelve NULL, posicion en caso contrario
-entrada* buscar(const char *clave)
-{
-	int pos;
-	entrada *e;
-	pos=h(clave,tamTabla);
-	while(tabla[pos].compLex!=-1 && strcmp(tabla[pos].lexema,clave)!=0 )
-	{
-		pos++;
-		if (pos==tamTabla)
-			pos=0;
-	}
-	return &tabla[pos];
-}
-
-void insertTablaSimbolos(const char *s, int n)
-{
-	entrada e;
-	sprintf(e.lexema,s);
-	e.compLex=n;
-	insertar(e);
-}
-
-void initTablaSimbolos()
-{
-	int i;
-	entrada pr,*e;
-	const char *vector[]={
-		"program",
-		"type",
-		"var",
-		"array",
-		"begin",
-		"end",
-		"do",
-		"to",
-		"downto",
-		"then",
-		"of",
-		"function",
-		"procedure", 
-		"integer", 
-		"real", 
-		"boolean", 
-		"char", 
-		"for", 
-		"if", 
-		"else", 
-		"while", 
-		"repeat", 
-		"until", 
-		"case", 
-		"record", 
-		"writeln",
-		"write",
-		"const"
-	};
- 	for (i=0;i<28;i++)
-	{
-		insertTablaSimbolos(vector[i],i+256);
-	}
-	insertTablaSimbolos(",",',');
-	insertTablaSimbolos(".",'.');
-	insertTablaSimbolos(":",':');
-	insertTablaSimbolos(";",';');
-	insertTablaSimbolos("(",'(');
-	insertTablaSimbolos(")",')');
-	insertTablaSimbolos("[",'[');
-	insertTablaSimbolos("]",']');
-	insertTablaSimbolos("true",BOOL);
-	insertTablaSimbolos("false",BOOL);
-	insertTablaSimbolos("not",NOT);
-	insertTablaSimbolos("<",OPREL);
-	insertTablaSimbolos("<=",OPREL);
-	insertTablaSimbolos("<>",OPREL);
-	insertTablaSimbolos(">",OPREL);
-	insertTablaSimbolos(">=",OPREL);
-	insertTablaSimbolos("=",OPREL);
-	insertTablaSimbolos("+",OPSUMA);
-	insertTablaSimbolos("-",OPSUMA);
-	insertTablaSimbolos("or",OPSUMA);
-	insertTablaSimbolos("*",OPMULT);
-	insertTablaSimbolos("/",OPMULT);
-	insertTablaSimbolos("div",OPMULT);
-	insertTablaSimbolos("mod",OPMULT);
-	insertTablaSimbolos(":=",OPASIGNA);
-}
 
 // Rutinas del analizador lexico
 
@@ -283,7 +48,7 @@ void error(const char* mensaje)
 
 void sigLex()
 {
-	int i=0, longid=0;
+	int i=0;
 	char c=0;
 	int acepto=0;
 	int estado=0;
@@ -321,7 +86,7 @@ void sigLex()
 			t.compLex=t.pe->compLex;
 			if (t.pe->compLex==-1)
 			{
-				sprintf(e.lexema,id);
+				strcpy(e.lexema,id);
 				e.compLex=ID;
 				insertar(e);
 				t.pe=buscar(id);
@@ -442,7 +207,7 @@ void sigLex()
 						t.pe=buscar(id);
 						if (t.pe->compLex==-1)
 						{
-							sprintf(e.lexema,id);
+							strcpy(e.lexema,id);
 							e.compLex=NUM;
 							insertar(e);
 							t.pe=buscar(id);
@@ -648,7 +413,7 @@ void sigLex()
 			t.compLex=t.pe->compLex;
 			if (t.pe->compLex==-1)
 			{
-				sprintf(e.lexema,id);
+				strcpy(e.lexema,id);
 				if (strlen(id)==3 || strcmp(id,"''''")==0)
 					e.compLex=CAR;
 				else
@@ -685,6 +450,7 @@ void sigLex()
 	if (c==EOF)
 	{
 		t.compLex=EOF;
+		// strcpy(e.lexema,"EOF");
 		sprintf(e.lexema,"EOF");
 		t.pe=&e;
 	}
@@ -694,7 +460,6 @@ void sigLex()
 int main(int argc,char* args[])
 {
 	// inicializar analizador lexico
-	int complex=0;
 
 	initTabla();
 	initTablaSimbolos();
