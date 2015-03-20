@@ -31,11 +31,6 @@ int delantero=-1;		// Utilizado por el analizador lexico
 int fin=0;				// Utilizado por el analizador lexico
 int numLinea=1;			// Numero de Linea
 
-/************** Prototipos *********************/
-
-
-void sigLex();		// Del analizador Lexico
-
 /**************** Funciones **********************/
 
 

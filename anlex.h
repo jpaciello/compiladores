@@ -72,3 +72,4 @@ void insertar(entrada e);
 entrada* buscar(const char *clave);
 void initTabla();
 void initTablaSimbolos();
+void sigLex();
