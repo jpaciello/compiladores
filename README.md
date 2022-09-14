@@ -1,9 +1,8 @@
 compiladores
 ============
 
-Compiladores FPUNA
+Autor: Elías Arévalo
 
-Autor: Julio Paciello
 
-Para compilar: gcc anlex.c tablaSimbolos.c -o anlex
+
 
