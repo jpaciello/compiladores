@@ -1,6 +1,6 @@
 class Archivo():
     """
-    Clase que abstrae la lectura y escritura de archivos
+    Clase que abstrae la lectura y escritura del archivo fuente y el archivo de salida.
     """
 
     def __init__(self, entrada="./fuente.txt", salida="./output.txt"):
@@ -10,7 +10,7 @@ class Archivo():
 
     def leer(self):
         """
-        Metodo que retorna el contenido del archivo.
+        Metodo que retorna el contenido del archivo fuente.
         """
         archivo = open(self.entrada)
         res = archivo.readlines()

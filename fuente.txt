@@ -1,4 +1,4 @@
-{  #$
+{
    "personas":[  
       {  
          "ci":1234567,
@@ -8,6 +8,14 @@
             {  
                "nombre":"Pedro",
                "edad":12
+            },
+            {
+               "nombre":"Carlos",
+               "edad":23
+            },
+            {
+               "nombre":"Tini",
+               "edad":21
             }
          ]
       },

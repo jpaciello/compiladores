@@ -5,8 +5,8 @@ if(__name__ == '__main__'):
     try:
         lexer = Regex()
         archivo = Archivo()
-        codigo = archivo.leer()
-        lexema = lexer.getLexema(codigo)
+        input = archivo.leer()
+        lexema = lexer.getLexema(input)
         archivo.escribir(lexema)
         print("Archivo output.txt generado.")
     except Exception as error:

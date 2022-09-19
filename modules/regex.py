@@ -1,12 +1,5 @@
-from http.client import CONTINUE
-from typing import NamedTuple
+# Se importa la libreria re, para poder identificar expresiones regulares.
 import re
-
-class Token(NamedTuple):
-    type: str
-    value: str
-    line: int
-    column: int
 
 
 class Regex:
@@ -15,7 +8,8 @@ class Regex:
     """
     
     def __init__(self):
-        self.componentesLexicos = [
+        # Se definen los lexemas a evaluar.
+        self.compLexicos = [
             ("NEW_LINE", r'\n'),
             ("L_CORCHETE", r'\['),
             ("R_CORCHETE", r']'),
@@ -30,24 +24,22 @@ class Regex:
             ("PR_NULL", r'null|NULL'),
             ("SKIP", r'[ \t]+')
         ]
-      
-
     
-    def getLexema (self, codigo):
+    def getLexema (self, input):
         """
-        Recorre el array de tuplas en donde estan definidos
-        los lexemas, y por cada token recibido, verifica 
-        su expresion regular.
+        Se recorre el array de tuplas en donde estan definidos
+        los lexemas, y por cada token recibido, verifica si su
+        expresion regular coincide con el codigo fuente.
         """
-        errors = []
+        errores = []
         resultado = ""
-        tipos = [e[0] for e in self.componentesLexicos]
+        tipos = [e[0] for e in self.compLexicos]
         try:
-            token_regex = '|'.join('(?P<%s>%s)' % par for par in self.componentesLexicos)
+            token_regex = '|'.join('(?P<%s>%s)' % par for par in self.compLexicos)
             numero_linea = 1 
-            inicio_linea = 0 
+            inicio_linea = 0
 
-            for token in re.finditer(token_regex, codigo):
+            for token in re.finditer(token_regex, input):
                 tipoLexema = token.lastgroup
                 valorLexema = token.group()
     
@@ -68,11 +60,11 @@ class Regex:
                 elif(tipoLexema in tipos):
                     resultado += tipoLexema + " "
                     continue
-                else:
-                    errors.append('Error {} no reconocido en la linea {}'.format(valorLexema, numero_linea))
+                elif (tipoLexema not in tipos):
+                    errores.append('Error, ', valorLexema, ' no específicado entre los lexemas encontrado en la linea: ',numero_linea)
             
-            if(len(errors) > 0):
-                raise('Ocurrieron los siguientes errores: ' + '\n'.join(errors))
+            if(len(errores) > 0):
+                raise('Errores durante la ejecución: ' + '\n'.join(errores))
             else:
                 print(resultado)
                 return resultado   
