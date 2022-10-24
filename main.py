@@ -1,5 +1,6 @@
 from modules.lector import Archivo
 from modules.regex import Regex
+from modules.syntax import analizador
 
 if(__name__ == '__main__'):
     try:
@@ -11,3 +12,6 @@ if(__name__ == '__main__'):
         print("Archivo output.txt generado.")
     except Exception as error:
         print(error)
+        raise error
+    else:
+        analizador(lexema)

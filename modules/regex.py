@@ -1,7 +1,13 @@
 # Se importa la libreria re, para poder identificar expresiones regulares.
+from typing import NamedTuple
 import re
 
-
+class Token(NamedTuple):
+    type: str
+    value: str
+    line: int
+    column: int
+    
 class Regex:
     """
     Clase Regex de Regular Expresions que inicializa los lexemas a evaluar.
@@ -22,7 +28,8 @@ class Regex:
             ("PR_TRUE", r'true|TRUE'),
             ("PR_FALSE", r'false|FALSE'),
             ("PR_NULL", r'null|NULL'),
-            ("SKIP", r'[ \t]+')
+            ("SKIP", r'[ \t]+'),
+            ("ESPACIO", r' ')
         ]
     
     def getLexema (self, input):
