@@ -1,4 +1,3 @@
-
 EOF = ''
 token = ''
 position = 0
@@ -16,9 +15,9 @@ def analizador(data):
     json()
 
     if(len(errors) < 1) :
-        print('Análisis de sintaxis ejecutado de forma correcta.')
+        print('Anàlisis de sintaxis realizado correctamente.')
     else: 
-        print('Errores encontrados en ejecución: ')
+        print('Errores ocurridos en a ejecuciòn: ')
         print(errors)
 
 

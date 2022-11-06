@@ -31,7 +31,9 @@ class Regex:
             ("SKIP", r'[ \t]+'),
             ("ESPACIO", r' ')
         ]
-    
+
+        self.tablaTraduccion = []
+
     def getLexema (self, input):
         """
         Se recorre el array de tuplas en donde estan definidos
@@ -45,6 +47,62 @@ class Regex:
             token_regex = '|'.join('(?P<%s>%s)' % par for par in self.compLexicos)
             numero_linea = 1 
             inicio_linea = 0
+
+            for token in re.finditer(token_regex, input):
+                temporal = {}
+                tipoLexema = token.lastgroup
+                valorLexema = token.group()
+
+                if(tipoLexema == "NEW_LINE"):
+                    numero_linea += 1
+                    inicio_linea = token.end()
+                    resultado += "\n"
+                    temporal = {
+                        "tipoLexema": tipoLexema,
+                        "resultado": "\n",
+                        "token" : valorLexema
+                    }
+                    self.tablaTraduccion.append(temporal)
+                    continue
+                elif(tipoLexema == "LITERAL_CADENA"):
+                    resultado += "STRING" + " "
+                    temporal = {
+                        "tipoLexema": tipoLexema,
+                        "resultado": "\n",
+                        "token" : valorLexema
+                    }
+                    self.tablaTraduccion.append(temporal)
+                    continue
+                elif(tipoLexema == "LITERAL_NUM"):
+                    resultado += "NUMBER" + " "
+                    temporal = {
+                        "tipoLexema": tipoLexema,
+                        "resultado": "\n",
+                        "token" : valorLexema
+                    }
+                    self.tablaTraduccion.append(temporal)
+                    continue
+                elif(tipoLexema == "SKIP"):
+                    resultado += "\t"
+                    temporal = {
+                        "tipoLexema": tipoLexema,
+                        "resultado": "\t",
+                        "token" : valorLexema
+                    }
+                    self.tablaTraduccion.append(temporal)
+                    continue
+                elif(tipoLexema in tipos):
+                    resultado += tipoLexema + " "
+                    temporal = {
+                        "tipoLexema": tipoLexema,
+                        "resultado": tipoLexema, 
+                        "token" : valorLexema
+                    }
+                    self.tablaTraduccion.append(temporal)
+                    continue
+                else:
+                    errores.append('Error {} no reconocido en la linea {}'.format(valorLexema, numero_linea))
+                    
 
             for token in re.finditer(token_regex, input):
                 tipoLexema = token.lastgroup

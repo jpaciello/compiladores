@@ -1,6 +1,7 @@
 from modules.lector import Archivo
 from modules.regex import Regex
 from modules.syntax import analizador
+from modules.traductor import traducir
 
 if(__name__ == '__main__'):
     try:
@@ -10,6 +11,9 @@ if(__name__ == '__main__'):
         lexema = lexer.getLexema(input)
         archivo.escribir(lexema)
         print("Archivo output.txt generado.")
+        traducido = traducir(lexer.tablaTraduccion)
+        archivoTraducido = Archivo(salida="output.xml")
+        archivoTraducido.escribir(traducido)
     except Exception as error:
         print(error)
         raise error
